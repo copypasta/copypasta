@@ -42,7 +42,7 @@ class signup:
 				db.select('example_users', where='user=$form.d.username', vars=locals())[0]
 				return "user exist already!"
 			except:
-				db.insert('example_users', user=form.d.username, password=form.d.username)
+				db.insert('example_users', user=form.d.username, password=form.d.password)
 				return "account created!"
 
 class login: 

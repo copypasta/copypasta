@@ -1,3 +1,7 @@
-<a href="guest">Guest</a>
-<a href="login">Login</a>
-<a href="signup">Signup</a>
+$def with (posts)
+
+                    $for post in posts:
+                        <h2><a href='/view/$post.id'>$post.title</a> <a href='/edit/$post.id'>Edit</a></h2>
+                        <p class='preview'>$datestr(post.posted_on)</p>
+                        <hr/>
+                        

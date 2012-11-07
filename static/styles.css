@@ -29,13 +29,11 @@ h1{
 	font-size:30px;
 }
 h2{
-	margin-top:15px;
 	font-size:19px;
 	color:#333;
 }
 h3{
 	font-size:12px;
-	margin-top:15px;
 	color:#666;
 }
 p{
@@ -111,7 +109,41 @@ h3.subscribe{
 	padding: 0 10px 0 10px;
 }
 
-
+    .focusField{
+    	border:solid 2px #73A6FF;
+    	background:#EFF5FF;
+    	color:#000;
+		margin: 10px;
+		padding: 10px;
+    }
+    .idleField{
+    	background:#EEE;
+    	color: #6F6F6F;
+		border: solid 2px #00000;
+		margin: 10px;
+		padding: 10px;
+    }	
+	
+	hr {
+    height: 30px;
+	margin-bottom: -30px;    
+	margin-top: 20px;    
+  
+    border-style: solid;
+    border-color: #c0c0c0;
+    border-width: 1px 0 0 0;
+    border-radius: 20px;
+	}
+	hr:before { /* Not really supposed to work, but does */
+		display: block;
+		content: "";
+		height: 30px;
+		margin-top: -31px;    
+		border-style: solid;
+		border-color: #c0c0c0;
+		border-width: 0 0 1px 0;
+		border-radius: 20px;
+	}
 /*
 	The "Desktop" layout
 */
@@ -195,6 +227,39 @@ h3.subscribe{
 	.sidebar ul.subscribe li{
 		border:inherit;
 	}
+    .focusField{
+    	border:solid 2px #73A6FF;
+    	background:#EFF5FF;
+    	color:#000;
+		margin: 10px;
+		padding: 10px;
+    }
+    .idleField{
+    	background:#EEE;
+    	color: #6F6F6F;
+		border: solid 2px #00000;
+		margin: 10px;
+		padding: 10px;
+    }	
 	
-	
+	hr {
+    height: 30px;
+	margin-bottom: -30px;    
+	margin-top: 20px;    
+  
+    border-style: solid;
+    border-color: #c0c0c0;
+    border-width: 1px 0 0 0;
+    border-radius: 20px;
+	}
+	hr:before {
+		display: block;
+		content: "";
+		height: 30px;
+		margin-top: -31px;    
+		border-style: solid;
+		border-color: #c0c0c0;
+		border-width: 0 0 1px 0;
+		border-radius: 20px;
+	}
 }

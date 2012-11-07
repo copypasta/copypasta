@@ -1,0 +1,8 @@
+$def with (form, error)
+
+<form name="main" method="post"> 
+$:form.render()
+$if error:
+	<b style="color:red">$error</b> <br />
+<input type="submit" value="Submit"/>    
+</form>

@@ -1,37 +1,44 @@
+""" model module for copypasta online clipboard """
+""" AppSec Fall 2012 """
+""" George Ryabov, Kelvin Yang, David Chan """
+""" requires webpy 0.3 """
+
 import web, datetime
 import sqlite3
 
 db = web.database(dbn='sqlite', db='pasta.sqlite')
 
 
-
-
 #db.query("CREATE TABLE entries (id INT AUTO_INCREMENT, title TEXT, content TEXT, posted_on DATETIME, primary key (id));")
 
-def get_posts():
-    return db.select('entries', order='id DESC')
+def get_posts(user):
+    return db.select('entries', order='id DESC', where='owner=$user', vars=locals())
 
-def get_id():
-    return db.select('entries', order='id DESC')
+def set_owner(sessionid, user):
+    db.update('entries', where="owner=$sessionid", vars=locals(),
+        owner=user)
+
+def get_id(user):
+    return db.select('entries', order='id DESC', where='owner=$user', vars=locals())
 
 
-def get_post(id):
+def get_post(id, user):
     try:
-        return db.select('entries', where='id=$id', vars=locals())[0]
+        return db.select('entries', where='id=$id AND owner=$user', vars=locals())[0]
     except IndexError:
         return None
 
-def new_post(title, text):
+def new_post(title, text, user):
 
     result = db.query("select MAX(id) as id from entries")
     newid = int(result[0].id) + 1
-    db.insert('entries', id=newid, title=title, content=text, posted_on=datetime.datetime.utcnow())
+    db.insert('entries', id=newid, title=title, content=text, posted_on=datetime.datetime.utcnow(), owner=user)
 
-def del_post(id):
-    db.delete('entries', where="id=$id", vars=locals())
+def del_post(id, user):
+    db.delete('entries', where="id=$id AND owner=$user", vars=locals())
 
-def update_post(id, title, text):
-    db.update('entries', where="id=$id", vars=locals(),
+def update_post(id, title, text, user):
+    db.update('entries', where="id=$id AND owner=$user", vars=locals(),
         title=title, content=text)
 
 def transform_datestr(posted_on):

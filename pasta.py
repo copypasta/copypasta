@@ -2,6 +2,10 @@
 """ AppSec Fall 2012 """
 """ George Ryabov, Kelvin Yang, David Chan """
 """ requires webpy 0.3 """
+import sys, os
+abspath = os.path.dirname(__file__)
+sys.path.append(abspath)
+os.chdir(abspath)
 import web
 import model
 from web import form
@@ -14,13 +18,11 @@ urls = (
     '/delete/(\d+)', 'delete',
     '/edit/(\d+)', 'edit',
     '/count', 'count',
+    '/getcode', 'getcode',
     '/logout', 'logout',
     '/login', 'login', ###login page####
     '/signup', 'signup', ###sign up page####
 )
-
-
-
 
 #####added code for mysql useraccounts######
 #db = web.database(dbn='mysql', db='users', user='useraccount', pw='useraccount1')
@@ -29,12 +31,14 @@ userdb = web.database(dbn='sqlite', db='users.sqlite')
 app = web.application(urls, locals())
 web.config.debug = False
 
-if web.config.get('_session') is None:
-    session = web.session.Session(app, web.session.DiskStore('sessions'), initializer={'count': 0})
-    web.config._session = session
-else:
-    session = web.config._session
+curdir = os.path.dirname(__file__)
 
+session = web.session.Session(app, web.session.DiskStore(os.path.join(curdir,'sessions')), initializer={'count': 0})
+#session = web.session.Session(app, web.session.DiskStore('sessions'), initializer={'count': 0})
+web.config._session = session
+
+####needed for apache!
+application = app.wsgifunc()
 
 ####form for login####
 loginform = form.Form(
@@ -50,18 +54,21 @@ signupform = form.Form(
 )
 
 def loggedin():
+    global session;
     if 'loggedin' not in session:
         return False;
     else:
         return session.loggedin;
 
 def user():
+    global session;
     if loggedin():
         return session.user;
-    else:
+    elif "session_id" in session:
         return session.session_id;
-
-
+    else:
+        return 0;
+        
 ### Templates
 t_globals = {
     'datestr': model.transform_datestr,
@@ -88,7 +95,7 @@ class index:
         posts = model.get_posts(user())
         form = self.form()
 
-        print session.session_id
+        #print session.session_id
 
         return render.index(posts, form)
 
@@ -180,9 +187,8 @@ class login:
 ###login class#####
 class logout:
     def GET(self):
-        session.loggedin = False
+        session.kill()
         raise web.seeother('/')
-
 
 ####sign up class####
 
@@ -212,7 +218,17 @@ class signup:
                 model.set_owner(session.session_id, user())
                 raise web.seeother('/')
 
+###login class#####
+class getcode:
+    def GET(self):
+        if loggedin():
+            return render.getcode()
+        else:
+            raise web.seeother('/')
+        #session.loggedin = False
+        #raise web.seeother('/')
 
+        
 if __name__ == '__main__':
 
     app.run()

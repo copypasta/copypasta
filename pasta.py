@@ -54,20 +54,30 @@ signupform = form.Form(
 )
 
 def loggedin():
-    global session;
+    global session
     if 'loggedin' not in session:
-        return False;
+        return False
     else:
-        return session.loggedin;
+        return session.loggedin
 
 def user():
-    global session;
+    global session
     if loggedin():
-        return session.user;
+        return session.user
     elif "session_id" in session:
-        return session.session_id;
+        return session.session_id
     else:
-        return 0;
+        return 0
+        
+def secretcode():
+    global session
+    if loggedin():
+        if "secretcode" in session:
+            return session.secretcode
+        else:
+            return ""
+    else:
+        return ""
         
 ### Templates
 t_globals = {
@@ -172,6 +182,7 @@ class login:
 
                 if hashed_password == password:
                     session.user = form.d.username
+                    session.secretcode = userinfo.secretcode
                     session.loggedin = True
                     model.set_owner(session.session_id, user())
                     raise web.seeother('/')
@@ -211,7 +222,7 @@ class signup:
                 newsalt = uuid.uuid4().hex
                 hashed_password = hashlib.sha512(form.d.password + newsalt).hexdigest()
 
-                userdb.insert('users', user=form.d.username, password=hashed_password, salt=newsalt)
+                userdb.insert('users', user=form.d.username, password=hashed_password, salt=newsalt, secretcode=str(uuid.uuid4()))
 
                 session.user = form.d.username
                 session.loggedin = True
@@ -221,13 +232,22 @@ class signup:
 ###login class#####
 class getcode:
     def GET(self):
+        global session
         if loggedin():
-            return render.getcode()
+            code = secretcode()
+            
+            if str(code) == "" or str(code) == "None":
+                code = str(uuid.uuid4())
+                session.secretcode = code
+                model.set_code(code, user())
+                
+            return render.getcode(code,"")
         else:
             raise web.seeother('/')
         #session.loggedin = False
         #raise web.seeother('/')
 
+        uuid.uuid4()
         
 if __name__ == '__main__':
 

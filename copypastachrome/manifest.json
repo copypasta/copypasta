@@ -1,0 +1,22 @@
+{
+  "name": "CopyPasta Chrome",
+  "version": "0.1",
+  "manifest_version": 2,
+  "description": "Add items to copypasta from Google Chrome.",
+  "options_page": "options.html",
+   "icons":
+   {
+      "128": "clipboard128.png",
+      "16": "clipboard16.png",
+      "48": "clipboard48.png"
+   },
+  "browser_action": {
+    "default_icon": "Clipboard32.png",
+    "default_popup": "popup.html"
+  },
+  "permissions": [
+    "http://copypasta.poly.edu/",
+	"clipboardRead",
+	"clipboardWrite"
+  ]
+}

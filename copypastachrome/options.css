@@ -1,0 +1,28 @@
+/**
+ * Copyright 2012 copypasta
+ */
+
+body {
+  background-color: #CCE0F5;
+  font-family: Verdana;
+}
+
+div.main {
+  padding: 20px;
+  margin: 30px auto;
+  width: 400px;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  border-color: #5F78AB;
+  border-style: solid;
+  border-width: 5px;
+}
+
+textarea {
+  border-color: #5F78AB;
+  border-style: solid;
+  border-width: 2px;
+
+}

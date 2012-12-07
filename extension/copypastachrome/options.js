@@ -1,3 +1,4 @@
+// Copyright (c) 2012 Copypasta
 
 // Saves settings to localStorage.
 function save_settings() {
@@ -28,9 +29,11 @@ function clear_settings() {
     status.innerHTML = "";
   }, 750);
  
-
 }
 
+function close_settings() {
+	window.close()
+}
 
 // Restores select box state to saved value from localStorage.
 function restore_settings() {
@@ -47,4 +50,5 @@ function restore_settings() {
 document.addEventListener('DOMContentReady', restore_settings);
 document.querySelector('#save').addEventListener('click', save_settings);
 document.querySelector('#clear').addEventListener('click', clear_settings);
+document.querySelector('#close').addEventListener('click', close_settings);
 restore_settings();

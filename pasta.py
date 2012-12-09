@@ -19,6 +19,7 @@ urls = (
     '/edit/(\d+)', 'edit',
     '/count', 'count',
     '/getcode', 'getcode',
+    '/getcode/new', 'getnewcode',
     '/logout', 'logout',
     '/login', 'login', ###login page####
     '/signup', 'signup', ###sign up page####
@@ -60,7 +61,7 @@ def loggedin():
     else:
         return session.loggedin
 
-def user():
+def getuser():
     global session
     if loggedin():
         return session.user
@@ -69,11 +70,11 @@ def user():
     else:
         return 0
         
-def secretcode():
+def codecreated():
     global session
     if loggedin():
-        if "secretcode" in session:
-            return session.secretcode
+        if "codecreated" in session:
+            return session.codecreated
         else:
             return ""
     else:
@@ -83,10 +84,9 @@ def secretcode():
 t_globals = {
     'datestr': model.transform_datestr,
     'loggedin':loggedin,
-    'user':user
+    'user':getuser
 }
 render = web.template.render('templates', base='base', globals= t_globals)
-
 
 class index:
 
@@ -95,14 +95,14 @@ class index:
             size=15,
             description="Title:"),
         web.form.Textarea('content', web.form.notnull,
-            rows=2, cols=40,
+            rows=2, cols=15,
             description="Clipboard:"),
         web.form.Button('Save Clipboard'),
     )
 
     def GET(self):
         """ Show page """
-        posts = model.get_posts(user())
+        posts = model.get_posts(getuser())
         form = self.form()
 
         #print session.session_id
@@ -111,23 +111,23 @@ class index:
 
     def POST(self):
         form = self.form()
-        posts = model.get_posts(user())
+        posts = model.get_posts(getuser())
         if not form.validates():
             return render.index(posts, form)
-        model.new_post(form.d.title, form.d.content, user())
+        model.new_post(form.d.title, form.d.content, getuser())
         raise web.seeother('/')
 
 class delete:
 
     def POST(self, id):
-        model.del_post(int(id), user())
+        model.del_post(int(id), getuser())
         raise web.seeother('/')
 
 
 class edit:
 
     def GET(self, id):
-        post = model.get_post(int(id), user())
+        post = model.get_post(int(id), getuser())
         form = index.form()
         form.fill(post)
         return render.edit(post, form)
@@ -135,10 +135,10 @@ class edit:
 
     def POST(self, id):
         form = index.form()
-        post = model.get_post(int(id), user())
+        post = model.get_post(int(id), getuser())
         if not form.validates():
             return render.edit(post, form)
-        model.update_post(int(id), form.d.title, form.d.content, user())
+        model.update_post(int(id), form.d.title, form.d.content, getuser())
         raise web.seeother('/')
 
 
@@ -182,9 +182,9 @@ class login:
 
                 if hashed_password == password:
                     session.user = form.d.username
-                    session.secretcode = userinfo.secretcode
+                    session.codecreated = userinfo.codecreated
                     session.loggedin = True
-                    model.set_owner(session.session_id, user())
+                    model.set_owner(session.session_id, getuser())
                     raise web.seeother('/')
                 else:
                     form = loginform()
@@ -222,11 +222,11 @@ class signup:
                 newsalt = uuid.uuid4().hex
                 hashed_password = hashlib.sha512(form.d.password + newsalt).hexdigest()
 
-                userdb.insert('users', user=form.d.username, password=hashed_password, salt=newsalt, secretcode=str(uuid.uuid4()))
+                userdb.insert('users', user=form.d.username, password=hashed_password, salt=newsalt, x=str(uuid.uuid4()))
 
                 session.user = form.d.username
                 session.loggedin = True
-                model.set_owner(session.session_id, user())
+                model.set_owner(session.session_id, getuser())
                 raise web.seeother('/')
 
 ###login class#####
@@ -234,20 +234,41 @@ class getcode:
     def GET(self):
         global session
         if loggedin():
-            code = secretcode()
+            code = codecreated()
             
             if str(code) == "" or str(code) == "None":
                 code = str(uuid.uuid4())
-                session.secretcode = code
-                model.set_code(code, user())
+                user = getuser()
+                userinfo = userdb.select('users', where='user=$user', vars=locals())
+                userinfo = userinfo[0]
+                salt = userinfo.password
+                hashed_secretcode = hashlib.sha512(code + salt).hexdigest()
+
+                session.codecreated =  model.set_code(hashed_secretcode, getuser())
+                return render.getcode(session.codecreated,"", True)
+            else:
+                return render.getcode(code,"", False)
                 
-            return render.getcode(code,"")
+            
         else:
             raise web.seeother('/')
-        #session.loggedin = False
-        #raise web.seeother('/')
+            
+class getnewcode:
+    def GET(self):
+        global session
+        if loggedin():
+            code = str(uuid.uuid4())
 
-        uuid.uuid4()
+            user = getuser()
+            userinfo = userdb.select('users', where='user=$user', vars=locals())
+            userinfo = userinfo[0]
+            salt = userinfo.password
+            hashed_secretcode = hashlib.sha512(code + salt).hexdigest()
+                
+            session.codecreated = model.set_code(hashed_secretcode, getuser())
+            return render.getcode(code,"", True)
+        else:
+            raise web.seeother('/')
         
 if __name__ == '__main__':
 

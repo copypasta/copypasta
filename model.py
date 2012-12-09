@@ -5,7 +5,7 @@
 
 import web, datetime
 import sqlite3
-
+import re
 db = web.database(dbn='sqlite', db='pasta.sqlite')
 userdb = web.database(dbn='sqlite', db='users.sqlite')
 
@@ -37,8 +37,10 @@ def new_post(title, text, user):
     db.insert('entries', id=newid, title=title, content=text, posted_on=datetime.datetime.utcnow(), owner=user)
     
 def set_code(code, user):
+    timestamp = datetime.datetime.utcnow()
     userdb.update('users', where="user=$user", vars=locals(),
-        secretcode=code)
+        secretcode=code, codecreated=datetime.datetime.utcnow())
+    return timestamp
     
 def del_post(id, user):
     db.delete('entries', where="id=$id AND owner=$user", vars=locals())
@@ -50,4 +52,3 @@ def update_post(id, title, text, user):
 def transform_datestr(posted_on):
     datetime_obj = datetime.datetime.strptime(posted_on,'%Y-%m-%d %H:%M:%S.%f')
     return web.datestr(datetime_obj)
-

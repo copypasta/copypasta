@@ -1,5 +1,10 @@
-$def with (code, error)
+$def with (code, error, newcode)
 
 <br />
-YOUR CODE: <input type="text" value="$code" size="40">
+$if newcode == True:
+    You will only see this code one time.    <br />
+    Enter it into your CopyPasta Chrome Extension settings    <br />
+    <input type="text" value="$code" size="40"> <u><a href="/getcode/new">Create New Code</a></u>
+$else:
+    Code last created: $code <u><a href="/getcode/new">Create New Code</a></u>
 <br />

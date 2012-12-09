@@ -6,10 +6,12 @@ $:form.render()
 <hr />
 
                     $for post in posts:
-                        <div style='margin: 20px;'>
-                        <div style='float:right'>$datestr(post.posted_on)</div>
+                        <span style='margin: 20px;'>
+                        <div style='float:right;'>$datestr(post.posted_on)</div>
                         <a href='/edit/$post.id'><b>$post.title</b> - edit</a>
                         <br /><br />
-                        <div>$post.content</div>
-                        </div>
-                        <hr/>
+                        <div style='-webkit-user-select:text;width:100%;min-height:30px;'><div style='width:100%;min-height:30px;-webkit-user-select:text'>
+                        $post.content
+                        </div></div>
+                        </span>
+                        <hr style='-webkit-user-select: none'/>

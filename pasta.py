@@ -10,6 +10,9 @@ import web
 import model
 from web import form
 import hashlib, uuid
+import json
+import base64
+from time import strftime
 
 ### Url mappings
 
@@ -20,6 +23,9 @@ urls = (
     '/count', 'count',
     '/getcode', 'getcode',
     '/getcode/new', 'getnewcode',
+    '/getclips', 'getclips',
+    '/postclip', 'postclip',
+    '/deleteclip', 'deleteclip',
     '/logout', 'logout',
     '/login', 'login', ###login page####
     '/signup', 'signup', ###sign up page####
@@ -30,16 +36,23 @@ urls = (
 userdb = web.database(dbn='sqlite', db='users.sqlite')
 
 app = web.application(urls, locals())
+####needed for apache!
+application = app.wsgifunc()
 web.config.debug = False
 
 curdir = os.path.dirname(__file__)
 
-session = web.session.Session(app, web.session.DiskStore(os.path.join(curdir,'sessions')), initializer={'count': 0})
 #session = web.session.Session(app, web.session.DiskStore('sessions'), initializer={'count': 0})
-web.config._session = session
 
-####needed for apache!
-application = app.wsgifunc()
+if web.config.get('_session') is None:
+    session = web.session.Session(app, web.session.DiskStore(os.path.join(curdir,'sessions')), initializer={'count': 0})
+    web.config._session = session
+else:
+    session = web.config._session
+
+
+if "session_id" not in session:
+    session.session_id = "0"
 
 ####form for login####
 loginform = form.Form(
@@ -69,7 +82,7 @@ def getuser():
         return session.session_id
     else:
         return 0
-        
+
 def codecreated():
     global session
     if loggedin():
@@ -79,7 +92,7 @@ def codecreated():
             return ""
     else:
         return ""
-        
+
 ### Templates
 t_globals = {
     'datestr': model.transform_datestr,
@@ -102,45 +115,51 @@ class index:
 
     def GET(self):
         """ Show page """
-        posts = model.get_posts(getuser())
+        clips = model.get_clips(getuser())
         form = self.form()
 
-        #print session.session_id
-
-        return render.index(posts, form)
+        return render.index(clips, form)
 
     def POST(self):
         form = self.form()
-        posts = model.get_posts(getuser())
+        clips = model.get_clips(getuser())
+
         if not form.validates():
-            return render.index(posts, form)
-        model.new_post(form.d.title, form.d.content, getuser())
+            return render.index(clips, form)
+
+        model.new_clip(form.d.title, form.d.content, getuser())
         raise web.seeother('/')
+
 
 class delete:
 
     def POST(self, id):
-        model.del_post(int(id), getuser())
+        model.del_clip(int(id), getuser())
         raise web.seeother('/')
 
 
 class edit:
 
     def GET(self, id):
-        post = model.get_post(int(id), getuser())
-        form = index.form()
-        form.fill(post)
-        return render.edit(post, form)
+        clip = model.get_clip(int(id), getuser())
+        if clip:
+            form = index.form()
+            form.fill(clip)
+            return render.edit(clip, form)
+        else:
+            raise web.seeother('/')
 
 
     def POST(self, id):
         form = index.form()
-        post = model.get_post(int(id), getuser())
-        if not form.validates():
-            return render.edit(post, form)
-        model.update_post(int(id), form.d.title, form.d.content, getuser())
-        raise web.seeother('/')
-
+        clip = model.get_clip(int(id), getuser())
+        if clip:
+            if not form.validates():
+                return render.edit(clip, form)
+            model.update_clip(int(id), form.d.title, form.d.content, getuser())
+            raise web.seeother('/')
+        else:
+            raise web.seeother('/')
 
 class count:
     def GET(self):
@@ -165,6 +184,7 @@ class login:
         return render.login(form, error)
 
     def POST(self):
+        global session
         error = ""
         form = loginform()
         if not form.validates():
@@ -173,6 +193,7 @@ class login:
 
             try:
                 userinfo = userdb.select('users', where='user=$form.d.username', vars=locals())
+
                 userinfo = userinfo[0]
 
                 password = userinfo.password
@@ -181,9 +202,11 @@ class login:
                 hashed_password = hashlib.sha512(form.d.password + salt).hexdigest()
 
                 if hashed_password == password:
+                    print session.session_id
                     session.user = form.d.username
                     session.codecreated = userinfo.codecreated
                     session.loggedin = True
+                    print session.session_id
                     model.set_owner(session.session_id, getuser())
                     raise web.seeother('/')
                 else:
@@ -235,7 +258,7 @@ class getcode:
         global session
         if loggedin():
             code = codecreated()
-            
+
             if str(code) == "" or str(code) == "None":
                 code = str(uuid.uuid4())
                 user = getuser()
@@ -248,11 +271,11 @@ class getcode:
                 return render.getcode(session.codecreated,"", True)
             else:
                 return render.getcode(code,"", False)
-                
-            
+
+
         else:
             raise web.seeother('/')
-            
+
 class getnewcode:
     def GET(self):
         global session
@@ -264,12 +287,119 @@ class getnewcode:
             userinfo = userinfo[0]
             salt = userinfo.password
             hashed_secretcode = hashlib.sha512(code + salt).hexdigest()
-                
+
             session.codecreated = model.set_code(hashed_secretcode, getuser())
             return render.getcode(code,"", True)
         else:
             raise web.seeother('/')
-        
+
+class getclips:
+    def GET(self):
+        usercode =  web.ctx.env.get("HTTP_X_COPYPASTA_CODE")
+
+        if usercode:
+
+            split = usercode.split("&")
+            user = split[0].split("=")[1]
+            code = split[1].split("=")[1]
+
+            if user:
+                userinfo = userdb.select('users', where='user=$user', vars=locals())
+                userinfo = userinfo[0]
+                salt = userinfo.password
+
+                hashed_secretcode = hashlib.sha512(code + salt).hexdigest()
+
+                if hashed_secretcode == userinfo.secretcode:
+                    clips = model.get_latest(user);
+                    web.header('Content-Type', 'application/json')
+                    return json.dumps(clips.list())
+                else:
+                    dict = {'status':"Bad login"}
+                    web.header('Content-Type', 'application/json')
+                    return json.dumps(dict)
+            else:
+                dict = {'status':"Invalid user"}
+                web.header('Content-Type', 'application/json')
+                return json.dumps(dict)
+        else:
+            raise web.seeother('/')
+
+class postclip:
+    def POST(self):
+        usercode =  web.ctx.env.get("HTTP_X_COPYPASTA_CODE")
+
+        if usercode:
+
+            split = usercode.split("&")
+            user = split[0].split("=")[1]
+            code = split[1].split("=")[1]
+
+            if user:
+                userinfo = userdb.select('users', where='user=$user', vars=locals())
+                userinfo = userinfo[0]
+                salt = userinfo.password
+
+                hashed_secretcode = hashlib.sha512(code + salt).hexdigest()
+
+                if hashed_secretcode == userinfo.secretcode:
+                    newclip = base64.b64decode(web.data())
+                    model.new_clip("by " + user + " on " + strftime("%Y-%m-%d %H:%M"), newclip, user)
+                    web.header('Content-Type', 'application/json')
+                    dict = {'status':"Clip saved"}
+                    return json.dumps(dict)
+                else:
+                    dict = {'status':"Bad login"}
+                    web.header('Content-Type', 'application/json')
+                    return json.dumps(dict)
+            else:
+                dict = {'status':"Invalid user"}
+                web.header('Content-Type', 'application/json')
+                return json.dumps(dict)
+        else:
+            raise web.seeother('/')
+
+class deleteclip:
+    def POST(self):
+        usercode =  web.ctx.env.get("HTTP_X_COPYPASTA_CODE")
+
+        if usercode:
+
+            split = usercode.split("&")
+            user = split[0].split("=")[1]
+            code = split[1].split("=")[1]
+
+            if user:
+                userinfo = userdb.select('users', where='user=$user', vars=locals())
+                userinfo = userinfo[0]
+                salt = userinfo.password
+
+                hashed_secretcode = hashlib.sha512(code + salt).hexdigest()
+
+                if hashed_secretcode == userinfo.secretcode:
+                    id = web.data()
+                    print id;
+                    if id:
+                        model.del_clip(int(id), getuser())
+
+                        web.header('Content-Type', 'application/json')
+                        dict = {'status':"Clip deleted"}
+                        return json.dumps(dict)
+                    else:
+                        dict = {'status':"Bad id"}
+                        web.header('Content-Type', 'application/json')
+                        return json.dumps(dict)
+                else:
+                    dict = {'status':"Bad login"}
+                    web.header('Content-Type', 'application/json')
+                    return json.dumps(dict)
+            else:
+                dict = {'status':"Invalid user"}
+                web.header('Content-Type', 'application/json')
+                return json.dumps(dict)
+        else:
+            raise web.seeother('/')
+
 if __name__ == '__main__':
 
     app.run()

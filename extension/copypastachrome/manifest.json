@@ -16,6 +16,8 @@
   },
   "permissions": [
     "http://copypasta.poly.edu/",
+    "https://copypasta.poly.edu/",
+    "http://127.0.0.1:8080/",
 	"clipboardRead",
 	"clipboardWrite"
   ]

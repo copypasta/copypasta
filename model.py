@@ -13,7 +13,7 @@ userdb = web.database(dbn='sqlite', db='users.sqlite')
 
 #db.query("CREATE TABLE entries (id INT AUTO_INCREMENT, title TEXT, content TEXT, posted_on DATETIME, primary key (id));")
 
-def get_posts(user):
+def get_clips(user):
     return db.select('entries', order='id DESC', where='owner=$user', vars=locals())
 
 def set_owner(sessionid, user):
@@ -24,28 +24,34 @@ def get_id(user):
     return db.select('entries', order='id DESC', where='owner=$user', vars=locals())
 
 
-def get_post(id, user):
+def get_clip(id, user):
     try:
         return db.select('entries', where='id=$id AND owner=$user', vars=locals())[0]
     except IndexError:
         return None
 
-def new_post(title, text, user):
+def get_latest(user):
+    try:
+        return db.select('entries', where='owner=$user',  order="posted_on DESC", limit=4, vars=locals())
+    except IndexError:
+        return None
+
+def new_clip(title, text, user):
 
     result = db.query("select MAX(id) as id from entries")
     newid = int(result[0].id) + 1
     db.insert('entries', id=newid, title=title, content=text, posted_on=datetime.datetime.utcnow(), owner=user)
-    
+
 def set_code(code, user):
     timestamp = datetime.datetime.utcnow()
     userdb.update('users', where="user=$user", vars=locals(),
         secretcode=code, codecreated=datetime.datetime.utcnow())
     return timestamp
-    
-def del_post(id, user):
+
+def del_clip(id, user):
     db.delete('entries', where="id=$id AND owner=$user", vars=locals())
 
-def update_post(id, title, text, user):
+def update_clip(id, title, text, user):
     db.update('entries', where="id=$id AND owner=$user", vars=locals(),
         title=title, content=text)
 

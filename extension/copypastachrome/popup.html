@@ -5,19 +5,21 @@
 	<link rel="stylesheet" type="text/css" href="options.css" />
 
 	<script src="jquery-1.8.3.min.js"></script>
+	<script src="jquery.base64.min.js"></script>
   </head>
   <body>
-	<div style="font-size:10px;font-weight:bold;padding:2px;">Current Clipboard:<div>
-	<textarea id="clipboard" cols="30" rows="5"></textarea>
+	<div style="position:absolute;float:right;right:10px; font-size:10px;font-weight:bold;padding:2px;">
+	<a href="https://copypasta.poly.edu" target="_blank">CopyPasta on the web</a>
+	</div>
+	<div style="font-size:10px;font-weight:bold;padding:2px;">Current Clipboard</div>
+	
+	<textarea id="clipboard" cols="30" rows="4"></textarea>
 	<button id="post">Post to CopyPasta</button>
 	<hr />
-	<div style="font-size:10px;font-weight:bold;padding:2px;">Previous Clipboards:<div>
-	<textarea id="priorclip1" cols="30" rows="3"></textarea>
-	<textarea id="priorclip2" cols="30" rows="3"></textarea>
-	<textarea id="priorclip3" cols="30" rows="3"></textarea>
-	<textarea id="priorclip4" cols="30" rows="3"></textarea>
-	<button id="copy">Copy selected clipboard</button>
-	<div style="font-size:12px;float:right;margin:6px;"id="status"></div>
+	<div id="oldclipboards">
+	
+	</div>
+
     <script src="popup.js"></script>
 	
 	</body>

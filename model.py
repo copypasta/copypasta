@@ -30,6 +30,12 @@ def get_clip(id, user):
     except IndexError:
         return None
 
+def get_clip_public(publicid):
+    try:
+        return db.select('entries', where='publicid=$publicid', vars=locals())[0]
+    except IndexError:
+        return None
+
 def get_latest(user):
     try:
         return db.select('entries', where='owner=$user',  order="posted_on DESC", limit=4, vars=locals())
@@ -54,6 +60,11 @@ def del_clip(id, user):
 def update_clip(id, title, text, user):
     db.update('entries', where="id=$id AND owner=$user", vars=locals(),
         title=title, content=text)
+
+
+def share_clip(id, uniquid, user):
+    db.update('entries', where="id=$id AND owner=$user", vars=locals(),
+        publicid=uniquid)
 
 def transform_datestr(posted_on):
     datetime_obj = datetime.datetime.strptime(posted_on,'%Y-%m-%d %H:%M:%S.%f')

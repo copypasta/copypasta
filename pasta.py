@@ -18,8 +18,11 @@ from time import strftime
 
 urls = (
     '/', 'index',
-    '/delete/(\d+)', 'delete',
+    '/delete/(\d+)/(\d+)', 'delete',
     '/edit/(\d+)', 'edit',
+    '/share/(\d+)', 'share',
+    '/unshare/(\d+)', 'unshare',
+    '/view/(.+)', 'view',
     '/count', 'count',
     '/getcode', 'getcode',
     '/getcode/new', 'getnewcode',
@@ -137,6 +140,32 @@ class delete:
         model.del_clip(int(id), getuser())
         raise web.seeother('/')
 
+class share:
+
+    def GET(self, id):
+
+        uniqueid = uuid.uuid4().hex
+
+        model.share_clip(int(id), uniqueid, getuser())
+        raise web.seeother('/')
+
+class unshare:
+
+    def GET(self, id):
+
+        uniqueid =""
+
+        model.share_clip(int(id), uniqueid, getuser())
+        raise web.seeother('/')
+
+class view:
+
+    def GET(self, uniqueid):
+
+
+        clip = model.get_clip_public(uniqueid)
+
+        return render.view(clip)
 
 class edit:
 

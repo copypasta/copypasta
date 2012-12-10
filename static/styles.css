@@ -93,7 +93,7 @@ h3.subscribe{
 	right:0px;
 	border:none;
 	color:#fff;
-    
+
 }
 .sidebar ul.subscribe li{
 	border:none;
@@ -124,13 +124,13 @@ h3.subscribe{
 		border: solid 2px #00000;
 		margin: 10px;
 		padding: 10px;
-    }	
-	
+    }
+
 	hr {
     height: 30px;
-	margin-bottom: -30px;    
-	margin-top: 20px;    
-  
+	margin-bottom: -30px;
+	margin-top: 20px;
+
     border-style: solid;
     border-color: #c0c0c0;
     border-width: 1px 0 0 0;
@@ -140,7 +140,7 @@ h3.subscribe{
 		display: block;
 		content: "";
 		height: 30px;
-		margin-top: -31px;    
+		margin-top: -31px;
 		border-style: solid;
 		border-color: #c0c0c0;
 		border-width: 0 0 1px 0;
@@ -170,7 +170,7 @@ h3.subscribe{
 		-moz-box-shadow:0px 0px 7px #999;
 		-o-box-shadow:0px 0px 7px #999;
 		box-shadow:0px 0px 7px #999;
-		
+
 		-webkit-border-radius:0 0 10px 10px;
 		-moz-border-radius:0 0 10px 10px;
 		-o-border-radius:0 0 10px 10px;
@@ -180,7 +180,7 @@ h3.subscribe{
 		float:left;
 		width:680px;
 		padding: 0 20px 0 0;
-		
+
 	}
 	.entries p{
 		display:block;
@@ -190,7 +190,7 @@ h3.subscribe{
 		width:100px;
 		text-align:right;
 	}
-	
+
 	.sidebar ul{
 		border:none;
 		padding:0;
@@ -200,7 +200,7 @@ h3.subscribe{
 		padding:0;
 		border:none;
 	}
-	
+
 	.foot{
 		float:left;
 		width:100%;
@@ -209,11 +209,11 @@ h3.subscribe{
 		color:#000;
 		background:transparent;
 	}
-	
+
 	/*
 		These sidebar styles are pretty specific
-		So that they can successfully override the 
-		non-media-query styles and the other 
+		So that they can successfully override the
+		non-media-query styles and the other
 		more general sidebar styles
 	*/
 	h3.subscribe{
@@ -242,13 +242,13 @@ h3.subscribe{
 		border: solid 2px #00000;
 		margin: 10px;
 		padding: 10px;
-    }	
-	
+    }
+
 	hr {
     height: 30px;
-	margin-bottom: -30px;    
-	margin-top: 20px;    
-  
+	margin-bottom: -30px;
+	margin-top: 20px;
+
     border-style: solid;
     border-color: #c0c0c0;
     border-width: 1px 0 0 0;
@@ -258,7 +258,7 @@ h3.subscribe{
 		display: block;
 		content: "";
 		height: 30px;
-		margin-top: -31px;    
+		margin-top: -31px;
 		border-style: solid;
 		border-color: #c0c0c0;
 		border-width: 0 0 1px 0;

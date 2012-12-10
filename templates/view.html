@@ -1,0 +1,18 @@
+$def with (clip)
+
+                        $if clip:
+                            <hr /><br />
+                            <span style='margin: 20px;'>
+                            <div style='float:right;'>$datestr(clip.posted_on)</div>
+                            <a href='/edit/$clip.id'><b>$clip.title</b> - edit</a>
+
+                            <br /><br />
+                            <div style='-webkit-user-select:text;width:100%;min-height:30px;'><div style='padding:20px;width:100%;min-height:30px;-webkit-user-select:text'>
+                            $clip.content
+                            </div></div>
+                            </span>
+                            <hr style='-webkit-user-select: none'/>
+                        $else:
+                            <hr /><br />
+                            <center><b>Sorry, this content is no longer shared</b></center>
+                            <hr style='-webkit-user-select: none'/>

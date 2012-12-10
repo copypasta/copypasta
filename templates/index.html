@@ -8,9 +8,17 @@ $:form.render()
                     $for post in posts:
                         <span style='margin: 20px;'>
                         <div style='float:right;'>$datestr(post.posted_on)</div>
-                        <a href='/edit/$post.id'><b>$post.title</b> - edit</a>
+                        <a href='/edit/$post.id' style='color:#000080;'><b>$post.title</b> - edit</a> |
+
+
+                        $if post.publicid:
+                            <a href='/view/$post.publicid' style='color:#008000;'>share url</a> |
+                            <a href='/unshare/$post.id' style='color:#800000;'>unshare</a>
+                        $else:
+                            <a href='/share/$post.id' style='color:#008000;'>share</a>
+
                         <br /><br />
-                        <div style='-webkit-user-select:text;width:100%;min-height:30px;'><div style='width:100%;min-height:30px;-webkit-user-select:text'>
+                        <div style='-webkit-user-select:text;width:100%;min-height:30px;'><div style='padding:20px;width:100%;min-height:30px;-webkit-user-select:text'>
                         $post.content
                         </div></div>
                         </span>

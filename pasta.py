@@ -222,7 +222,7 @@ class signup:
                 newsalt = uuid.uuid4().hex
                 hashed_password = hashlib.sha512(form.d.password + newsalt).hexdigest()
 
-                userdb.insert('users', user=form.d.username, password=hashed_password, salt=newsalt, x=str(uuid.uuid4()))
+                userdb.insert('users', user=form.d.username, password=hashed_password, salt=newsalt, secretcode=str(uuid.uuid4()))
 
                 session.user = form.d.username
                 session.loggedin = True

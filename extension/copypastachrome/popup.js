@@ -1,7 +1,7 @@
 // Copyright (c) 2012 Copypasta
 	var clipboard = ""
 	var selected = ""
-	var host = "http://127.0.0.1:8080"	
+	var host = "https://copypasta.poly.edu/"	
 	var req;
 	
 function getclips() {

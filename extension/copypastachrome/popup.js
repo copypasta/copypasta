@@ -98,10 +98,22 @@ function processclips(content) {
 	var clips = $.parseJSON(content);
 	var htmlcontent = ""
 	var iClip = 0;
-	
+
+    
 	for (clip in clips){
 		iClip = parseFloat(clip) + 1;
 		
+        if (clip == "status")
+        {
+        
+            htmlcontent += "<div id=\"status\" style=\"padding:5px;font-size:11px; float:right\"></div>"
+            
+            $('#oldclipboards').html(htmlcontent);
+        	var status = document.getElementById("status");
+            status.innerHTML = clips.status;
+            return false;
+        }
+        
 		if (iClip == 1)
 		{
 			htmlcontent +=  "<div style=\"font-size:10px;font-weight:bold;padding:2px;\">Prior Clips</div>";

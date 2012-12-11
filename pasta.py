@@ -331,9 +331,9 @@ class getclips:
             split = usercode.split("&")
             user = split[0].split("=")[1]
             code = split[1].split("=")[1]
-
-            if user:
+            if user and user != 'undefined':
                 userinfo = userdb.select('users', where='user=$user', vars=locals())
+
                 userinfo = userinfo[0]
                 salt = userinfo.password
 

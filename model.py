@@ -1,6 +1,6 @@
 """ model module for copypasta online clipboard """
 """ AppSec Fall 2012 """
-""" George Ryabov, Kelvin Yang, David Chan """
+""" George Ryabov, Kelvin Yang, David Chan, Anthony Candarini """
 """ requires webpy 0.3 """
 
 import web, datetime

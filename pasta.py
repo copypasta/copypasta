@@ -1,6 +1,6 @@
 """ main module for copypasta online clipboard """
 """ AppSec Fall 2012 """
-""" George Ryabov, Kelvin Yang, David Chan """
+""" George Ryabov, Kelvin Yang, David Chan, Anthony Candarini """
 """ requires webpy 0.3 """
 import sys, os
 abspath = os.path.dirname(__file__)
@@ -18,7 +18,7 @@ from time import strftime
 
 urls = (
     '/', 'index',
-    '/delete/(\d+)/(\d+)', 'delete',
+    '/delete/(\d+)', 'delete',
     '/edit/(\d+)', 'edit',
     '/share/(\d+)', 'share',
     '/unshare/(\d+)', 'unshare',
